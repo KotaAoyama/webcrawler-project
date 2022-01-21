@@ -17,4 +17,9 @@ public final class ProfilerModule extends AbstractModule {
   Profiler provideProfiler(Clock clock) {
     return new ProfilerImpl(clock);
   }
+
+  @Override
+  protected void configure() {
+
+  }
 }

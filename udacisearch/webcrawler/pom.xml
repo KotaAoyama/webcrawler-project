@@ -10,7 +10,7 @@
     <version>1.0</version>
 
     <properties>
-        <maven.compiler.release>11</maven.compiler.release>
+        <maven.compiler.release>14</maven.compiler.release>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
@@ -26,7 +26,7 @@
         <dependency>
             <groupId>com.google.inject</groupId>
             <artifactId>guice</artifactId>
-            <version>4.2.3</version>
+            <version>5.0.1</version>
         </dependency>
         <!-- https://mvnrepository.com/artifact/javax.inject/javax.inject -->
         <dependency>
@@ -76,7 +76,7 @@
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>3.8.1</version>
                 <configuration>
-                    <release>11</release>
+                    <release>14</release>
                 </configuration>
             </plugin>
             <plugin>
