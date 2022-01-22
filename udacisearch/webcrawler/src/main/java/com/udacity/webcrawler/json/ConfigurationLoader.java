@@ -65,8 +65,8 @@ public final class ConfigurationLoader {
         }
 
         return new CrawlerConfiguration.Builder()
-                .addIgnoredWords(config.getIgnoredWords().toArray(String[]::new))
-                .addIgnoredUrls(config.getIgnoredUrls().toArray(String[]::new))
+                .addIgnoredWords(config.getIgnoredWords().stream().map(Pattern::toString).toArray(String[]::new))
+                .addIgnoredUrls(config.getIgnoredUrls().stream().map(Pattern::toString).toArray(String[]::new))
                 .addStartPages(config.getStartPages().toArray(String[]::new))
                 .setImplementationOverride(config.getImplementationOverride())
                 .setMaxDepth(config.getMaxDepth())
