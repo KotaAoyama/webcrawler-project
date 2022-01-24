@@ -164,14 +164,16 @@ public final class CrawlTask extends RecursiveTask<CrawlTask> {
             }
         }
         List<CrawlTask> subTasks = result.getLinks().stream()
-                .map(link -> new CrawlTask(clock,
-                        parserFactory,
-                        link,
-                        deadLine,
-                        maxDepth - 1,
-                        counts,
-                        visitedUrls,
-                        ignoredUrls))
+                .map(link -> new CrawlTask.Builder()
+                        .clock(clock)
+                        .ignoredUrls(ignoredUrls)
+                        .visitedUrls(visitedUrls)
+                        .counts(counts)
+                        .maxDepth(maxDepth - 1)
+                        .deadLine(deadLine)
+                        .parserFactory(parserFactory)
+                        .url(link)
+                        .build())
                 .collect(Collectors.toList());
         invokeAll(subTasks);
         return new CrawlTask(clock, parserFactory, null, deadLine, 0, counts, visitedUrls, ignoredUrls);

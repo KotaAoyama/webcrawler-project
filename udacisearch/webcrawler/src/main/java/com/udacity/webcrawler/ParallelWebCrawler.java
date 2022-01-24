@@ -29,17 +29,17 @@ final class ParallelWebCrawler implements WebCrawler {
   @Inject
   ParallelWebCrawler(
           Clock clock,
+          PageParserFactory parserFactory,
           @Timeout Duration timeout,
           @PopularWordCount int popularWordCount,
           @TargetParallelism int threadCount,
-          PageParserFactory parserFactory,
           @MaxDepth int maxDepth,
           @IgnoredUrls List<Pattern> ignoredUrls) {
     this.clock = clock;
+    this.parserFactory = parserFactory;
     this.timeout = timeout;
     this.popularWordCount = popularWordCount;
     this.pool = new ForkJoinPool(Math.min(threadCount, getMaxParallelism()));
-    this.parserFactory = parserFactory;
     this.maxDepth = maxDepth;
     this.ignoredUrls = ignoredUrls;
   }
@@ -64,7 +64,7 @@ final class ParallelWebCrawler implements WebCrawler {
                             .visitedUrls(visitedUrls)
                             .build()))
             .map(crawlTask -> new CrawlResult.Builder()
-                    .setWordCounts(crawlTask.getCounts())
+                    .setWordCounts(WordCounts.sort(crawlTask.getCounts(), popularWordCount))
                     .setUrlsVisited(crawlTask.getVisitedUrls().size())
                     .build())
             .collect(Collectors.toList());
