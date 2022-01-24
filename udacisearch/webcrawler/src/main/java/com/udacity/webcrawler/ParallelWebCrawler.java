@@ -53,9 +53,16 @@ final class ParallelWebCrawler implements WebCrawler {
     List<CrawlResult> totalCrawlResult = startingUrls
             .parallelStream()
             .map(
-                    url -> pool.invoke(new CrawlTask(
-                            clock, parserFactory, url, deadLine, maxDepth, counts, visitedUrls, ignoredUrls)
-                    ))
+                    url -> pool.invoke(new CrawlTask.Builder()
+                            .clock(clock)
+                            .counts(counts)
+                            .deadLine(deadLine)
+                            .ignoredUrls(ignoredUrls)
+                            .maxDepth(maxDepth)
+                            .parserFactory(parserFactory)
+                            .url(url)
+                            .visitedUrls(visitedUrls)
+                            .build()))
             .map(crawlTask -> new CrawlResult.Builder()
                     .setWordCounts(crawlTask.getCounts())
                     .setUrlsVisited(crawlTask.getVisitedUrls().size())

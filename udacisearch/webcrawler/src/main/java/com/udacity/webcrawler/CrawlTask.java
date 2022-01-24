@@ -73,6 +73,68 @@ public final class CrawlTask extends RecursiveTask<CrawlTask> {
         return ignoredUrls;
     }
 
+    public static final class Builder {
+        private Clock clock = Clock.systemUTC();
+        private PageParserFactory parserFactory = null;
+        private String url = "";
+        private Instant deadLine = Instant.EPOCH;
+        private int maxDepth = 0;
+        private Map<String, Integer> counts = null;
+        private Set<String> visitedUrls = null;
+        private List<Pattern> ignoredUrls = null;
+
+        public Builder clock(Clock clock) {
+            this.clock = clock;
+            return this;
+        }
+
+        public Builder parserFactory(PageParserFactory parserFactory) {
+            this.parserFactory = parserFactory;
+            return this;
+        }
+
+        public Builder url(String url) {
+            this.url = url;
+            return this;
+        }
+
+        public Builder deadLine(Instant deadLine) {
+            this.deadLine = deadLine;
+            return this;
+        }
+
+        public Builder maxDepth(int maxDepth) {
+            this.maxDepth = maxDepth;
+            return this;
+        }
+
+        public Builder counts(Map<String, Integer> counts) {
+            this.counts = counts;
+            return this;
+        }
+
+        public Builder visitedUrls(Set<String> visitedUrls) {
+            this.visitedUrls = visitedUrls;
+            return this;
+        }
+
+        public Builder ignoredUrls(List<Pattern> ignoredUrls) {
+            this.ignoredUrls = ignoredUrls;
+            return this;
+        }
+
+        public CrawlTask build() {
+            return new CrawlTask(clock,
+                    parserFactory,
+                    url,
+                    deadLine,
+                    maxDepth,
+                    counts,
+                    visitedUrls,
+                    ignoredUrls);
+        }
+    }
+
     @Override
     protected CrawlTask compute() {
         if (maxDepth == 0 || clock.instant().isAfter(deadLine)) {
