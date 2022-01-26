@@ -1,5 +1,6 @@
 package com.udacity.webcrawler;
 
+import com.udacity.webcrawler.json.CrawlResult;
 import com.udacity.webcrawler.parser.PageParser;
 import com.udacity.webcrawler.parser.PageParserFactory;
 
@@ -12,7 +13,7 @@ import java.util.concurrent.RecursiveTask;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-public final class CrawlTask extends RecursiveTask<CrawlTask> {
+public final class CrawlTask extends RecursiveTask<CrawlResult> {
 
     private final Clock clock;
     private final PageParserFactory parserFactory;
@@ -136,7 +137,7 @@ public final class CrawlTask extends RecursiveTask<CrawlTask> {
     }
 
     @Override
-    protected CrawlTask compute() {
+    protected CrawlResult compute() {
         if (maxDepth == 0 || clock.instant().isAfter(deadLine)) {
             return null;
         }
@@ -176,6 +177,10 @@ public final class CrawlTask extends RecursiveTask<CrawlTask> {
                         .build())
                 .collect(Collectors.toList());
         invokeAll(subTasks);
-        return new CrawlTask(clock, parserFactory, null, deadLine, 0, counts, visitedUrls, ignoredUrls);
+
+        return new CrawlResult.Builder()
+                .setUrlsVisited(visitedUrls.size())
+                .setWordCounts(counts)
+                .build();
     }
 }

@@ -10,6 +10,7 @@ import java.time.Instant;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ForkJoinPool;
+import java.util.concurrent.Future;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
@@ -50,40 +51,44 @@ final class ParallelWebCrawler implements WebCrawler {
     Map<String, Integer> counts = new HashMap<>();
     Set<String> visitedUrls = new HashSet<>();
 
-    List<CrawlResult> totalCrawlResult = startingUrls
+    List<CrawlResult> crawlResultList = startingUrls
             .parallelStream()
             .map(
-                    url -> pool.invoke(new CrawlTask.Builder()
+                    startingUrl -> pool.invoke(new CrawlTask.Builder()
                             .clock(clock)
                             .counts(counts)
                             .deadLine(deadLine)
                             .ignoredUrls(ignoredUrls)
                             .maxDepth(maxDepth)
                             .parserFactory(parserFactory)
-                            .url(url)
+                            .url(startingUrl)
                             .visitedUrls(visitedUrls)
                             .build()))
-            .map(crawlTask -> new CrawlResult.Builder()
-                    .setWordCounts(WordCounts.sort(crawlTask.getCounts(), popularWordCount))
-                    .setUrlsVisited(crawlTask.getVisitedUrls().size())
-                    .build())
             .collect(Collectors.toList());
-    int totalVisitedUrls = totalCrawlResult.stream().mapToInt(CrawlResult::getUrlsVisited).sum();
-    Map<String, Integer> totalCounts = new HashMap<>();
-    List<Map<String, Integer>> countsList = totalCrawlResult.stream().map(CrawlResult::getWordCounts).collect(Collectors.toList());
-    for (Map<String, Integer> countMap : countsList) {
-      for (String key : countMap.keySet()) {
-        if (totalCounts.containsKey(key)) {
-          totalCounts.replace(key, totalCounts.get(key) + countMap.get(key));
+
+    int totalVisitedUrls = crawlResultList
+            .stream()
+            .mapToInt(CrawlResult::getUrlsVisited)
+            .sum();
+
+    Map<String, Integer> totalWordCounts = new HashMap<>();
+    List<Map<String, Integer>> wordCountsList = crawlResultList
+            .stream()
+            .map(CrawlResult::getWordCounts)
+            .collect(Collectors.toList());
+    for (Map<String, Integer> wordCounts : wordCountsList) {
+      for (Map.Entry<String, Integer> e : wordCounts.entrySet()) {
+        if (totalWordCounts.containsKey(e.getKey())) {
+          totalWordCounts.put(e.getKey(), e.getValue() + totalWordCounts.get(e.getKey()));
         } else {
-          totalCounts.put(key, countMap.get(key));
+          totalWordCounts.put(e.getKey(), e.getValue());
         }
       }
     }
 
     return new CrawlResult.Builder()
             .setUrlsVisited(totalVisitedUrls)
-            .setWordCounts(totalCounts)
+            .setWordCounts(WordCounts.sort(totalWordCounts, popularWordCount))
             .build();
   }
 
