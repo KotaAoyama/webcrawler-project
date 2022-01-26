@@ -2,7 +2,6 @@ package com.udacity.webcrawler;
 
 import com.udacity.webcrawler.json.CrawlResult;
 import com.udacity.webcrawler.parser.PageParserFactory;
-import org.codehaus.plexus.util.CollectionUtils;
 
 import javax.inject.Inject;
 import java.time.Clock;
@@ -65,7 +64,8 @@ final class ParallelWebCrawler implements WebCrawler {
                             .build()))
             .collect(Collectors.toList());
 
-    if (crawlResultList.size() == 1 && crawlResultList.get(0) == null) {
+    if (crawlResultList.size() == 0 ||
+            (crawlResultList.size() == 1 && crawlResultList.get(0) == null)) {
       return new CrawlResult.Builder()
               .setUrlsVisited(0)
               .setWordCounts(new HashMap<String, Integer>())
