@@ -74,12 +74,14 @@ final class ParallelWebCrawler implements WebCrawler {
 
     int totalVisitedUrls = crawlResultList
             .stream()
+            .filter(Objects::nonNull)
             .mapToInt(CrawlResult::getUrlsVisited)
             .sum();
 
     Map<String, Integer> totalWordCounts = new HashMap<>();
     List<Map<String, Integer>> wordCountsList = crawlResultList
             .stream()
+            .filter(Objects::nonNull)
             .map(CrawlResult::getWordCounts)
             .collect(Collectors.toList());
     for (Map<String, Integer> wordCounts : wordCountsList) {
