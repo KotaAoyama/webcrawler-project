@@ -13,7 +13,7 @@ import java.util.concurrent.RecursiveTask;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-public final class CrawlTask extends RecursiveTask<CrawlResult> {
+public final class CrawlInnerTask extends RecursiveTask<CrawlResult> {
 
     private final Clock clock;
     private final PageParserFactory parserFactory;
@@ -24,7 +24,7 @@ public final class CrawlTask extends RecursiveTask<CrawlResult> {
     private final Set<String> visitedUrls;
     private final List<Pattern> ignoredUrls;
 
-    public CrawlTask(Clock clock,
+    public CrawlInnerTask(Clock clock,
                      PageParserFactory parserFactory,
                      String url,
                      Instant deadLine,
@@ -40,38 +40,6 @@ public final class CrawlTask extends RecursiveTask<CrawlResult> {
         this.counts = counts;
         this.visitedUrls = visitedUrls;
         this.ignoredUrls = ignoredUrls;
-    }
-
-    public Clock getClock() {
-        return clock;
-    }
-
-    public PageParserFactory getParserFactory() {
-        return parserFactory;
-    }
-
-    public String getUrl() {
-        return url;
-    }
-
-    public Instant getDeadLine() {
-        return deadLine;
-    }
-
-    public int getMaxDepth() {
-        return maxDepth;
-    }
-
-    public Map<String, Integer> getCounts() {
-        return counts;
-    }
-
-    public Set<String> getVisitedUrls() {
-        return visitedUrls;
-    }
-
-    public List<Pattern> getIgnoredUrls() {
-        return ignoredUrls;
     }
 
     public static final class Builder {
@@ -124,8 +92,8 @@ public final class CrawlTask extends RecursiveTask<CrawlResult> {
             return this;
         }
 
-        public CrawlTask build() {
-            return new CrawlTask(clock,
+        public CrawlInnerTask build() {
+            return new CrawlInnerTask(clock,
                     parserFactory,
                     url,
                     deadLine,
@@ -164,8 +132,8 @@ public final class CrawlTask extends RecursiveTask<CrawlResult> {
                 }
             }
         }
-        List<CrawlTask> subTasks = result.getLinks().stream()
-                .map(link -> new CrawlTask.Builder()
+        List<CrawlInnerTask> subTasks = result.getLinks().stream()
+                .map(link -> new CrawlInnerTask.Builder()
                         .clock(clock)
                         .ignoredUrls(ignoredUrls)
                         .visitedUrls(visitedUrls)

@@ -10,7 +10,6 @@ import java.time.Instant;
 import java.util.*;
 import java.util.concurrent.ForkJoinPool;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
 /**
  * A concrete implementation of {@link WebCrawler} that runs multiple threads on a
@@ -49,54 +48,29 @@ final class ParallelWebCrawler implements WebCrawler {
     Map<String, Integer> counts = Collections.synchronizedMap(new HashMap<>());
     Set<String> visitedUrls = Collections.synchronizedSet(new HashSet<>());
 
-    List<CrawlResult> crawlResultList = startingUrls
-            .parallelStream()
-            .map(
-                    startingUrl -> pool.invoke(new CrawlTask.Builder()
-                            .clock(clock)
-                            .counts(counts)
-                            .deadLine(deadLine)
-                            .ignoredUrls(ignoredUrls)
-                            .maxDepth(maxDepth)
-                            .parserFactory(parserFactory)
-                            .url(startingUrl)
-                            .visitedUrls(visitedUrls)
-                            .build()))
-            .collect(Collectors.toList());
+    for (String startingUrl : startingUrls) {
+      pool.invoke(new CrawlInnerTask.Builder()
+              .clock(clock)
+              .counts(counts)
+              .deadLine(deadLine)
+              .ignoredUrls(ignoredUrls)
+              .maxDepth(maxDepth)
+              .parserFactory(parserFactory)
+              .url(startingUrl)
+              .visitedUrls(visitedUrls)
+              .build());
+    }
 
-    if (crawlResultList.size() == 0 ||
-            (crawlResultList.size() == 1 && crawlResultList.get(0) == null)) {
+    if (counts.isEmpty()) {
       return new CrawlResult.Builder()
-              .setUrlsVisited(0)
-              .setWordCounts(new HashMap<String, Integer>())
+              .setUrlsVisited(visitedUrls.size())
+              .setWordCounts(counts)
               .build();
     }
 
-    int totalVisitedUrls = crawlResultList
-            .stream()
-            .filter(Objects::nonNull)
-            .mapToInt(CrawlResult::getUrlsVisited)
-            .sum();
-
-    Map<String, Integer> totalWordCounts = new HashMap<>();
-    List<Map<String, Integer>> wordCountsList = crawlResultList
-            .stream()
-            .filter(Objects::nonNull)
-            .map(CrawlResult::getWordCounts)
-            .collect(Collectors.toList());
-    for (Map<String, Integer> wordCounts : wordCountsList) {
-      for (Map.Entry<String, Integer> e : wordCounts.entrySet()) {
-        if (totalWordCounts.containsKey(e.getKey())) {
-          totalWordCounts.put(e.getKey(), e.getValue() + totalWordCounts.get(e.getKey()));
-        } else {
-          totalWordCounts.put(e.getKey(), e.getValue());
-        }
-      }
-    }
-
     return new CrawlResult.Builder()
-            .setUrlsVisited(totalVisitedUrls)
-            .setWordCounts(WordCounts.sort(totalWordCounts, popularWordCount))
+            .setUrlsVisited(visitedUrls.size())
+            .setWordCounts(WordCounts.sort(counts, popularWordCount))
             .build();
   }
 
@@ -104,4 +78,5 @@ final class ParallelWebCrawler implements WebCrawler {
   public int getMaxParallelism() {
     return Runtime.getRuntime().availableProcessors();
   }
+
 }
