@@ -45,7 +45,7 @@ final class ParallelWebCrawler implements WebCrawler {
   @Override
   public CrawlResult crawl(List<String> startingUrls) {
     Instant deadLine = clock.instant().plus(timeout);
-    Map<String, Integer> counts = Collections.synchronizedMap(new HashMap<>());
+    Map<String, Integer> counts = Collections.synchronizedMap(new LinkedHashMap<>());
     Set<String> visitedUrls = Collections.synchronizedSet(new HashSet<>());
 
     for (String startingUrl : startingUrls) {
