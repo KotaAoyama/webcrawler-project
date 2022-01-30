@@ -12,6 +12,8 @@ import com.udacity.webcrawler.profiler.ProfilerModule;
 import org.jsoup.internal.StringUtil;
 
 import javax.inject.Inject;
+import java.io.Writer;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Objects;
 
@@ -34,7 +36,7 @@ public final class WebCrawlerMain {
 
     CrawlResult result = crawler.crawl(config.getStartPages());
     CrawlResultWriter resultWriter = new CrawlResultWriter(result);
-    String resultPath =config.getResultPath();
+    String resultPath = config.getResultPath();
     if (StringUtil.isBlank(resultPath)) {
       System.out.printf("urlsVisited: %s, wordCounts: %s", result.getUrlsVisited(), result.getWordCounts());
     } else {
@@ -42,7 +44,12 @@ public final class WebCrawlerMain {
     }
 
     // TODO: Write the profile data to a text file (or System.out if the file name is empty)
-    System.out.println(profiler.toString());
+    String profileOutputPath = config.getProfileOutputPath();
+    if (profileOutputPath.isBlank()) {
+      System.out.println("profileOutputPath is empty");
+    } else {
+      profiler.writeData(Path.of(profileOutputPath));
+    }
   }
 
   public static void main(String[] args) throws Exception {

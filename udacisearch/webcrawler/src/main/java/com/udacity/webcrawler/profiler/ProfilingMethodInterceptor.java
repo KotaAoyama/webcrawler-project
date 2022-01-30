@@ -45,7 +45,6 @@ final class ProfilingMethodInterceptor implements InvocationHandler {
         } finally {
             Profiled annotation = method.getAnnotation(Profiled.class);
             if (annotation != null) {
-        //      throw new IllegalArgumentException("The method is not profiled");
                 ZonedDateTime now = ZonedDateTime.now(clock);
                 Duration duration = Duration.between(startTime, now);
                 startTime = now;
