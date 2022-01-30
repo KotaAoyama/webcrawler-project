@@ -48,7 +48,7 @@ final class ProfilerImpl implements Profiler {
     Object proxy = Proxy.newProxyInstance(
             ProfilerImpl.class.getClassLoader(),
             new Class<?>[] {klass},
-            new ProfilingMethodInterceptor(clock, startTime, delegate));
+            new ProfilingMethodInterceptor(clock, startTime, state, delegate));
 
     return (T) proxy;
   }
