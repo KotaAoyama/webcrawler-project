@@ -1,6 +1,7 @@
 package com.udacity.webcrawler.profiler;
 
 import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.time.Clock;
 import java.time.Duration;
@@ -14,14 +15,14 @@ import java.util.Objects;
 final class ProfilingMethodInterceptor implements InvocationHandler {
 
   private final Clock clock;
-  private final ProfilingState state;
   private final ZonedDateTime startTime;
+  private final Object delegate;
 
   // TODO: You will need to add more instance fields and constructor arguments to this class.
-  ProfilingMethodInterceptor(Clock clock, ProfilingState state, ZonedDateTime startTime) {
+  ProfilingMethodInterceptor(Clock clock, ZonedDateTime startTime, Object delegate) {
     this.clock = Objects.requireNonNull(clock);
-    this.state = state;
-    this.startTime = startTime;
+    this.startTime = Objects.requireNonNull(startTime);
+    this.delegate = Objects.requireNonNull(delegate);
   }
 
   @Override
@@ -32,14 +33,23 @@ final class ProfilingMethodInterceptor implements InvocationHandler {
     //       methods, the interceptor should record how long the method call took, using the
     //       ProfilingState methods.
 
-    Profiled annotation = method.getAnnotation(Profiled.class);
-    if (annotation == null) {
-      throw new IllegalArgumentException("The method is not profiled");
+    Object result = null;
+    try {
+      result = method.invoke(delegate, args);
+    } catch (IllegalAccessException e) {
+      throw new RuntimeException(e);
+    } catch (InvocationTargetException e) {
+      e.printStackTrace();
     }
 
-    Duration duration = Duration.between(startTime, ZonedDateTime.now(clock));
-    state.record(proxy.getClass(), method, duration);
+//    Profiled annotation = method.getAnnotation(Profiled.class);
+//    if (annotation == null) {
+//      throw new IllegalArgumentException("The method is not profiled");
+//    }
 
-    return proxy;
+    Duration duration = Duration.between(startTime, ZonedDateTime.now(clock));
+//    state.record(proxy.getClass(), method, duration);
+
+    return result;
   }
 }

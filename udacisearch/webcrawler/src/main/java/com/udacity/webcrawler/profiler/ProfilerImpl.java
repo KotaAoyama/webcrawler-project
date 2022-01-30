@@ -42,14 +42,14 @@ final class ProfilerImpl implements Profiler {
       throw new IllegalArgumentException("klass doesn't have any profiled annotations");
     }
 
-
     // TODO: Use a dynamic proxy (java.lang.reflect.Proxy) to "wrap" the delegate in a
     //       ProfilingMethodInterceptor and return a dynamic proxy from this method.
     //       See https://docs.oracle.com/javase/10/docs/api/java/lang/reflect/Proxy.html.
     Object proxy = Proxy.newProxyInstance(
-            klass.getClassLoader(),
-            klass.getInterfaces(),
-            new ProfilingMethodInterceptor(clock, state, startTime));
+            ProfilerImpl.class.getClassLoader(),
+            new Class<?>[] {klass},
+            new ProfilingMethodInterceptor(clock, startTime, delegate));
+
     return (T) proxy;
   }
 
