@@ -41,17 +41,17 @@ final class ProfilingMethodInterceptor implements InvocationHandler {
         } catch (IllegalAccessException e) {
             throw new RuntimeException(e);
         } catch (InvocationTargetException e) {
-            e.printStackTrace();
+            throw new RuntimeException(e.getCause().getMessage());
+        } finally {
+            Profiled annotation = method.getAnnotation(Profiled.class);
+            if (annotation != null) {
+        //      throw new IllegalArgumentException("The method is not profiled");
+                ZonedDateTime now = ZonedDateTime.now(clock);
+                Duration duration = Duration.between(startTime, now);
+                startTime = now;
+                state.record(delegate.getClass(), method, duration);
+            }
         }
-
-    Profiled annotation = method.getAnnotation(Profiled.class);
-    if (annotation != null) {
-//      throw new IllegalArgumentException("The method is not profiled");
-        ZonedDateTime now = ZonedDateTime.now(clock);
-        Duration duration = Duration.between(startTime, now);
-        startTime = now;
-        state.record(delegate.getClass(), method, duration);
-    }
-    return result;
+        return result;
     }
 }
