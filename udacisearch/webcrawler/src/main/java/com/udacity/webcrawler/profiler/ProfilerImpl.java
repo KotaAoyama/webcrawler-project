@@ -52,8 +52,6 @@ final class ProfilerImpl implements Profiler {
 
   @Override
   public void writeData(Path path) {
-    // TODO: Write the ProfilingState data to the given file path. If a file already exists at that
-    //       path, the new data should be appended to the existing file.
     if (path == null) {
       return;
     }
