@@ -115,10 +115,8 @@ public final class CrawlInnerTask extends RecursiveTask<CrawlResult> {
             }
         }
 
-        synchronized (visitedUrls) {
-            if (!visitedUrls.add(url)) {
-                return null;
-            }
+        if (!visitedUrls.add(url)) {
+            return null;
         }
 
         PageParser.Result result = parserFactory.get(url).parse();
