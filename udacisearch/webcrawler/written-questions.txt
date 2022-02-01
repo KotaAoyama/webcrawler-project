@@ -35,4 +35,11 @@ Q4. Identify three (3) different design patterns used in this project, and expla
     For each pattern, name one thing about the pattern that you LIKED, and one thing you DISLIKED. If you did not like
     anything, you can name two things you disliked.
 
-
+A4. First, com.udacity.webcrawler.CrawlInnerTask uses Builder pattern. As for Builder pattern, I like the thing that I
+    don't have to care about the order of arguments when creating an instance. I don't like the thing that I have to
+    write the extra Builder class. Second, com.udacity.webcrawler.ParallelWebCrawler uses Dependency Injection pattern.
+    As for Dependency Injection pattern, I like the thing that I can use singleton pattern unconsciously. I don't like
+    the thing that it's a little bit complex than the other design patterns because I have to use some framework such as
+    Guice or Spring for using Dependency Injection. Third, com.udacity.webcrawler.SequentialWebCrawler uses Abstract
+    Factory pattern. As for Abstract Factory pattern, I like the thing that I can care about the only core input.
+    I don't like the thing that it's not easy to understand first.
