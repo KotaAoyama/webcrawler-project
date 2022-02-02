@@ -17,10 +17,14 @@ Q2. Your manager ran your crawler on her old personal computer, using the config
 
     (a) Suggest one reason why the sequential web crawler was able to read more web pages than the parallel crawler.
         (Hint: Try setting "parallelism" to 1 in the JSON configs to simulate your manager's computer.)
+    If the number of the parallel web crawler's threads is only one, the performance is almost same between the
+    parallel web crawler and the sequential web crawler. In that case, the sequential web crawler might outperforms
+    the parallel crawler.
 
     (b) Suggest one scenario in which the parallel web crawler will almost certainly perform better than the sequential
         crawler. Why will it perform better?
-
+    If the number of the parallel web crawler's threads is three, the parallel web crawler will almost certainly read
+    about triple urls than the sequential web crawler.
 
 Q3. Analyze your method profiler through the lens of Aspect Oriented Programming, by answering the following questions:
 
